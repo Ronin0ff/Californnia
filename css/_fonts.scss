@@ -1,0 +1,19 @@
+@import 'local-fonts';
+
+@font-face{
+  font-family: 'BPGBannerExtraSquareCaps';
+  src: url('../fonts/BPGBannerExtraSquareCaps.woff2') format('woff2'),
+      url('../fonts/BPGBannerExtraSquareCaps.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face{
+  font-family: 'Basicav.2012';
+  src: url('../fonts/Basicav.2012.woff2') format('woff2'),
+      url('../fonts/Basicav.2012.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

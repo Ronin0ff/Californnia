@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ka">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="https://fonts.googleapis.com/css2?family=Play:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="images/icons/favlogo.ico" type="image/x-icon">
+    <link rel="stylesheet" href="css/libs.min.css">
+    <link rel="stylesheet" href="css/style.min.css">
+    <title>RAGEMP.PRO</title>
+</head>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RAGEMP.PRO</title>
+</head>
+<body>
+  <header class="header">
+  <div class="container">
+    <div class="header__inner">
+      <a class="logo" href="index.html">
+        <img src="images/logo.png" alt="">
+      </a>
+      <nav class="menu">
+        <div class="menu__btn">
+          <div class="line-menu half start-top"></div>
+          <div class="line-menu"></div>
+          <div class="line-menu half end"></div>
+        </div>
+        <ul class="menu__list">
+          <li class="menu__list-item menu__list-forum">
+            <a class="menu__list-link" href="#">
+              Форум
+            </a>
+          </li>
+          <li class="menu__list-item menu__list-donate">
+            <a class="menu__list-link" href="donate.html">
+              Донат
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+  <audio id="myaudio" autoplay loop>
+    <source src="audio/music.ogg" type="audio/ogg; codecs=vorbis"></source>
+    <source src="audio/music.mp3" type="audio/mpeg"></source>
+  </audio>
+  <main class="donate" style="background-image: url(images/donate-bg.png);">
+    <div class="container">
+      <div class="donate__inner">
+        <img data-aos="fade-up" data-aos-delay="300" class="donate__img" src="images/content/characters.png" alt="">
+        <div data-aos="fade-left" data-aos-delay="500" class="item__box">
+          <div class="donate__form">
+            <div class="donate__form-title">
+              Введите данные
+            </div>
+            <span class="icon__form-menu"></span>
+            <span class="icon__form-user"></span>
+            <span class="icon__form-email"></span>
+            <span class="icon__form-coins"></span>
+            <form>
+              <select class="filter-style" data-placeholder="Выбирите сервер" required>
+                <option></option>
+                <option>Сервер 1</option>
+              </select>
+              <input class="donate__form-input" type="text" placeholder="Логин" required>
+              <input class="donate__form-input" type="email" placeholder="Почьта" required>
+              <input class="donate__form-input" type="number" min="0" placeholder="Количество" required>
+              <button class="donate-btn" type="submit">Пожертвовать</button>
+            </form>
+          </div>
+          <div class="item__info">
+            <div class="item__info-title">Информация
+              <span>По нашему курсу California Coin = 50 долларов США [за сервер]</span>
+            </div>
+            <div class="item__info-text">
+              <p>
+                С помощью California Coins вы можете покупать желаемые предметы и недвижимость на нашем сервере. Также California Coins позволяют покупать уникальные автомобили.
+              </p>
+              <p>
+                Когда вы покупаете California-монеты на сайте, необходимо подключиться к игровому серверу, и вы уже сможете сделать покупку из меню пончиков.
+              </p>
+            </div>
+            <div class="item__info-description">
+              В случае возникновения проблем свяжитесь с нами: NELSON или отправьте жалобу на форуме.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/libs.min.js"></script>
+<script src="js/main.min.js"></script>
+</body>
+</html>
