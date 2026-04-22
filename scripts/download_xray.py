@@ -43,7 +43,7 @@ def detect_platform() -> str:
 
 
 def download(url: str) -> bytes:
-    print(f"  ↳ {url}", flush=True)
+    print(f"  -> {url}", flush=True)
     req = urllib.request.Request(url, headers={"User-Agent": "byRDS-VPN build script"})
     with urllib.request.urlopen(req, timeout=120) as resp:  # noqa: S310 — releases only
         return resp.read()
@@ -68,7 +68,7 @@ def main() -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     # Xray
-    print(f"[xray] скачиваем {xray_asset}…")
+    print(f"[xray] downloading {xray_asset}...")
     zip_bytes = download(XRAY_LATEST.format(platform=xray_asset))
     with zipfile.ZipFile(io.BytesIO(zip_bytes)) as zf:
         for member in zf.namelist():
@@ -81,17 +81,17 @@ def main() -> int:
         raise SystemExit(f"xray binary not found inside zip (expected {xray_exe})")
     if not plat_key.startswith("windows"):
         target_path.chmod(0o755)
-    print(f"[xray] → {target_path}  ({target_path.stat().st_size:,} байт)")
+    print(f"[xray] -> {target_path}  ({target_path.stat().st_size:,} bytes)")
 
     # Geo assets
     for label, url in (("geoip.dat", GEOIP_URL), ("geosite.dat", GEOSITE_URL)):
-        print(f"[{label}] скачиваем…")
+        print(f"[{label}] downloading...")
         data = download(url)
         (out_dir / label).write_bytes(data)
         h = hashlib.sha256(data).hexdigest()[:16]
-        print(f"[{label}] → {out_dir / label} (sha256={h}…, {len(data):,} байт)")
+        print(f"[{label}] -> {out_dir / label} (sha256={h}..., {len(data):,} bytes)")
 
-    print("готово.")
+    print("done.")
     return 0
 
 
