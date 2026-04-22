@@ -1,0 +1,64 @@
+[project]
+name = "byrds-vpn"
+version = "1.0.0"
+description = "by RDS VPN — Windows-клиент для VLESS / VMess / Trojan на базе Xray-core"
+readme = "README.md"
+requires-python = ">=3.11"
+authors = [{ name = "RDS" }]
+license = { text = "MIT" }
+keywords = ["vpn", "xray", "vless", "vmess", "trojan", "reality", "windows"]
+
+dependencies = [
+    "PySide6>=6.7.0",
+    "httpx[socks]>=0.27.0",
+    "pywin32>=306; sys_platform == 'win32'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-qt>=4.4.0",
+    "ruff>=0.6.0",
+    "pyinstaller>=6.8.0",
+]
+
+[project.scripts]
+byrds-vpn = "byrds_vpn.app:main"
+
+[project.gui-scripts]
+byrds-vpn-gui = "byrds_vpn.app:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["byrds_vpn*"]
+
+[tool.setuptools.package-data]
+byrds_vpn = ["assets/**/*"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "N"]
+ignore = [
+    "E501",   # long lines (handled by formatter)
+    "N802",   # Qt-style methodNames required for Qt overrides
+    "N803",
+    "N806",
+    "N815",
+    "B008",
+    "SIM105",
+    "SIM117",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E501"]
+"byrds.spec" = ["F821", "E402"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"
