@@ -1,127 +1,175 @@
-# by RDS VPN
+# ProfitPilot AI
 
-**Профессиональный Windows-клиент для VPN-ссылок VLESS / VMess / Trojan**
-на базе [Xray-core](https://github.com/XTLS/Xray-core), с тёмным дизайном
-в стиле *Nightfall* и полной поддержкой русского языка.
+> Оптимизатор юнит-экономики для маркетплейсов Wildberries и Ozon в реальном времени.
 
-![by RDS VPN — dashboard](docs/screenshots/dashboard.png)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.5-blue)
+![React](https://img.shields.io/badge/React-18.3-61dafb)
+![Vite](https://img.shields.io/badge/Vite-5.4-646cff)
+![License](https://img.shields.io/badge/License-Proprietary-red)
 
----
+## Возможности
 
-## Ключевые возможности
+- **Расчёт юнит-экономики** — автоматический расчёт маржи, себестоимости и прибыли по каждому SKU
+- **AI-рекомендации** — интеллектуальные рекомендации по ценообразованию
+- **Репрайсер** — автоматическая корректировка цен для максимальной прибыли
+- **Биддер** — управление рекламными ставками
+- **Аналитика конкурентов** — мониторинг цен и стратегий конкурентов
+- **Интеграция с WB + Ozon** — подключение через API маркетплейсов
+- **Работа по SKU/артикулу** — ручной ввод без необходимости API
+- **CSV импорт/экспорт** — массовая загрузка и выгрузка товаров
+- **Подписочная модель** — Standard / Pro / Enterprise с ЮKassa
+- **Админ-панель** — MRR, пользователи, подписки, настройки
+- **Демо-режим** — доступ к демо-данным без регистрации
 
-### Протоколы и транспорт
-- **VLESS** — REALITY, XTLS-Vision, TLS, WS, gRPC, TCP, H2
-- **VMess** — стандартные v2rayN base64-ссылки, TLS/none, все транспорты
-- **Trojan** — TLS и REALITY
-- Полный разбор URI: `sni`, `pbk`, `sid`, `spx`, `fp`, `flow`, `alpn`, `path`, `host`, `serviceName` и др.
+## Стек технологий
 
-### Управление серверами
-- Импорт: вставка из буфера, `.txt`-файлы, HTTP(S)-подписки (включая base64)
-- Авто-дедупликация по `(протокол, адрес, порт, UUID/password)`
-- Поиск, группировка, избранное, тэги
-- Контекстное меню: редактировать, удалить, копировать ссылку, дублировать
-- Экспорт всех серверов в `.txt`
+| Технология | Назначение |
+|---|---|
+| React 18 + TypeScript | Frontend SPA |
+| Vite 5 | Сборщик |
+| Tailwind CSS + shadcn/ui | UI-фреймворк |
+| Recharts | Графики и диаграммы |
+| MetaGPTx Web SDK | Backend-as-a-Service |
+| ЮKassa | Платежи |
+| Vitest | Unit-тестирование |
+| Docker + nginx | Контейнеризация |
+| GitHub Actions | CI/CD |
 
-### Диагностика
-- **TCP-пинг** всех серверов параллельно (50 потоков)
-- **Тест скорости** загрузки через активный SOCKS5-прокси (Cloudflare Speed endpoint)
-- **История метрик**: real-time график трафика + буфер ping (60 точек)
-- Лог-терминал с цветовой подсветкой уровней + экспорт
+## Быстрый старт
 
-### Маршрутизация
-- Белый список (Direct) — домены и IP обходят VPN
-- Чёрный список (Block) — полностью блокируются
-- Proxy-домены — принудительно через VPN
-- Наборы `geosite:*` (ru / cn / private / category-ads-all)
-- Наборы `geoip:*` (private, cn, ru)
-- **Split Tunneling по процессам** (Windows, через routing + WFP-совместимый маркер)
-- Режимы маршрутизации: обычный, Gaming (низкая латентность), Streaming, Bypass-China
+### Требования
 
-### Защита
-- **Kill Switch** — автоматически блокирует всё, кроме Xray, через Windows Firewall
-- **Auto-reconnect** — восстановление соединения при обрыве
-- **DNS Leak Protection** — DNS-запросы внутри туннеля (system / Cloudflare / AdGuard / Google / custom DoH)
-- **MUX** — мультиплексирование потоков (настраиваемая concurrency)
+- Node.js ≥ 20
+- pnpm ≥ 9
 
-### Интеграция с Windows
-- Автозапуск при старте системы (через `HKCU\...\Run`)
-- Системный прокси Windows (WinINet: SOCKS/HTTP)
-- Иконка в трее с меню подключения
-- Сворачивание в трей при закрытии
-- Запуск в свёрнутом виде (`--minimized`)
-
-### Дизайн
-- Полностью тёмная палитра **Nightfall**: глубокий сине-чёрный фон, акцент *royal violet* `#7C5CFF`
-- Собственный логотип (QPainter-рендер, без внешних изображений)
-- Анимированная power-кнопка с пульсацией при подключении
-- Сворачиваемая боковая панель (rail-mode)
-- Полностью русский интерфейс (+ английская локаль)
-
----
-
-## Установка (пользователь)
-
-Скачайте готовый `byRDS-VPN.exe` из раздела [Releases](../../releases) — он уже содержит `xray.exe`, `geoip.dat`, `geosite.dat`.
-
-## Сборка `.exe` (Windows)
-
-```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -e ".[dev]"
-python scripts/download_xray.py          # скачивает xray.exe + geo*.dat в vendor/
-pyinstaller --clean --noconfirm byrds.spec
-# результат: dist\byRDS-VPN\byRDS-VPN.exe
-```
-
-## Разработка (Linux / macOS / Windows)
+### Установка
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # на Windows: .venv\Scripts\activate
-pip install -e ".[dev]"
-pytest                            # юнит-тесты (парсеры, config-builder, storage)
-ruff check .                      # линтер
-python -m byrds_vpn               # UI (Qt)
+git clone https://github.com/Ronin0ff/Californnia.git
+cd Californnia
+cp .env.example .env
+pnpm install
 ```
 
-На не-Windows системах Windows-specific функции (system proxy, autostart, kill switch) автоматически отключаются — для разработки и тестов UI это не проблема.
+### Разработка
 
----
+```bash
+pnpm dev        # Запуск dev-сервера (http://localhost:3000)
+pnpm build      # Production-сборка
+pnpm preview    # Превью production-сборки
+pnpm test       # Запуск тестов (watch mode)
+pnpm test:run   # Запуск тестов (однократно)
+pnpm lint       # ESLint
+pnpm typecheck  # TypeScript проверка типов
+```
+
+### Docker
+
+```bash
+docker-compose up --build       # Запуск в контейнере
+# → http://localhost:3000
+```
+
+## Переменные окружения
+
+| Переменная | Описание | По умолчанию |
+|---|---|---|
+| `VITE_API_BASE_URL` | URL бэкенд-сервера | `http://127.0.0.1:8000` |
+| `VITE_OWNER_EMAILS` | Email владельцев (через запятую) | — |
+| `VITE_YUKASSA_SHOP_ID` | ID магазина ЮKassa | — |
+| `VITE_YUKASSA_RETURN_URL` | URL возврата после оплаты | — |
+| `VITE_METAGPTX_APP_ID` | ID приложения MetaGPTx | — |
 
 ## Архитектура
 
 ```
-byrds_vpn/
-├── app.py, __main__.py          — точка входа
-├── core/
-│   ├── models.py                — Profile, StreamSettings, Settings (dataclass)
-│   ├── parsers/{vless,vmess,trojan}.py
-│   ├── config_builder.py        — Profile + Settings → Xray JSON
-│   ├── xray_manager.py          — запуск / остановка subprocess
-│   ├── storage.py               — profiles.json / settings.json (атомарные записи)
-│   ├── subscription.py          — импорт из текста / файла / URL
-│   ├── ping.py, speedtest.py
-│   ├── autostart.py, system_proxy.py, kill_switch.py  — Windows-интеграция
-│   ├── logs.py                  — буфер + экспорт
-│   └── controller.py            — связывает UI <-> core
-├── ui/
-│   ├── theme.py                 — палитра Nightfall + Qt stylesheet
-│   ├── icons.py                 — QPainter-рендер логотипа / иконок
-│   ├── main_window.py           — QMainWindow + трей
-│   ├── pages/{dashboard,servers,routing,settings,logs,about}.py
-│   └── widgets/{power_toggle,traffic_chart,sidebar,topbar,metric_card,dialogs}.py
-└── i18n/                        — ru / en
-
-tests/                           — pytest (парсеры, config_builder, subscription, storage)
-scripts/download_xray.py         — CI: скачивает xray + geo-assets
-.github/workflows/               — ci.yml (Linux tests), windows-build.yml (PyInstaller)
-byrds.spec                       — PyInstaller (onedir)
+src/
+├── __tests__/              # Unit-тесты (Vitest)
+├── api/                    # API клиенты (settings)
+├── components/             # React-компоненты
+│   ├── ui/                 # shadcn/ui библиотека
+│   ├── AppLayout.tsx       # Основной layout (mobile responsive)
+│   ├── AdminLayout.tsx     # Layout админ-панели
+│   ├── CookieConsent.tsx   # Cookie-баннер (152-ФЗ)
+│   ├── OnboardingTour.tsx  # Онбординг для новых пользователей
+│   ├── SubscriptionGuard.tsx # Защита роутов по подписке
+│   └── ThemeProvider.tsx   # Тёмная/светлая тема
+├── contexts/
+│   ├── AuthContext.tsx      # Аутентификация + RBAC
+│   └── DemoModeContext.tsx  # Демо-режим
+├── lib/
+│   ├── marketplace-api.ts  # CRUD API для SKU, маркетплейсов
+│   ├── plan-limits.ts      # Лимиты по тарифам
+│   ├── config.ts           # Runtime конфигурация
+│   └── auth.ts             # HTTP API клиент
+├── pages/
+│   ├── Landing.tsx          # Лендинг с тарифами и FAQ
+│   ├── Demo.tsx             # Демо-режим
+│   ├── Dashboard.tsx        # Главный дашборд
+│   ├── SkuManagement.tsx    # Управление SKU
+│   ├── Pricing.tsx          # Страница тарифов
+│   ├── PrivacyPolicy.tsx    # Политика конфиденциальности
+│   ├── TermsOfService.tsx   # Пользовательское соглашение
+│   └── admin/               # Админ-панель (6 страниц)
+└── App.tsx                  # Маршрутизация + Guards
 ```
 
----
+### RBAC (Role-Based Access Control)
+
+| Роль | Доступ |
+|---|---|
+| **Owner** | Все функции + админ-панель |
+| **Client (Enterprise)** | Все функции + команда |
+| **Client (Pro)** | Все функции кроме команды |
+| **Client (Standard)** | Дашборд, SKU, калькулятор, алерты, интеграции |
+| **Manager** | Настраиваемые права |
+
+### Тарифные планы
+
+| | Standard | Pro | Enterprise |
+|---|---|---|---|
+| Цена/мес | 2 500 ₽ | 4 990 ₽ | 19 990 ₽ |
+| Макс. SKU | 10 | 50 | ∞ |
+| AI-рекомендации | — | ✓ | ✓ |
+| Репрайсер | — | ✓ | ✓ |
+| Биддер | — | ✓ | ✓ |
+| Команда | — | — | ✓ |
+
+## Деплой
+
+### Vercel (рекомендуется)
+
+1. Подключите репозиторий на [vercel.com/import](https://vercel.com/import)
+2. Настройки:
+   - **Framework**: Vite
+   - **Build Command**: `pnpm build`
+   - **Output Directory**: `dist`
+   - **Install Command**: `pnpm install`
+3. Добавьте переменные окружения
+4. Deploy
+
+### Docker
+
+```bash
+docker build -t profitpilot .
+docker run -p 3000:80 profitpilot
+```
+
+## Тестирование
+
+```bash
+pnpm test:run   # 21 тест — бизнес-логика, permissions, plan limits
+```
+
+## Безопасность
+
+- RBAC с тарифными ограничениями
+- Сумма оплаты определяется на сервере (не на клиенте)
+- CSP headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy)
+- Cookie consent (152-ФЗ compliance)
+- Политика конфиденциальности и Пользовательское соглашение
+- Нет hardcoded секретов в коде
 
 ## Лицензия
 
-[MIT](LICENSE). by RDS · 2026.
+Proprietary. Все права защищены © 2026 ProfitPilot AI.

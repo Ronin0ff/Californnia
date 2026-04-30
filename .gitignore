@@ -1,21 +1,15 @@
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-*.egg
-.pytest_cache/
-.ruff_cache/
-.mypy_cache/
-.coverage
-htmlcov/
-build/
-dist/
-*.spec.bak
+# Dependencies
+node_modules/
+.pnpm-store/
 
-# venv
-.venv/
-venv/
-env/
+# Build
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.production
 
 # IDE
 .vscode/
@@ -26,13 +20,8 @@ env/
 .DS_Store
 Thumbs.db
 
-# Project-specific
-vendor/xray*
-vendor/geoip.dat
-vendor/geosite.dat
-vendor/wintun*.dll
-/dist/
-/build/
-logs/
+# Logs
 *.log
-byrds_vpn/assets/logo_cache*.png
+
+# Vercel
+.vercel/
