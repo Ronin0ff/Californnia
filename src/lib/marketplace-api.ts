@@ -101,7 +101,7 @@ export function calculateProfitability(data: Partial<Sku>) {
 
   let status = 'break_even';
   if (marginPct > 2) status = 'profitable';
-  else if (marginPct < 0) status = 'unprofitable';
+  else if (marginPct < 0 || netProfit < 0) status = 'unprofitable';
 
   return {
     commission,

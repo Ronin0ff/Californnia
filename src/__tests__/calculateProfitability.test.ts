@@ -60,7 +60,7 @@ describe('calculateProfitability', () => {
     expect(result.status).toBe('break_even');
   });
 
-  it('handles zero selling price', () => {
+  it('handles zero selling price as unprofitable when costs exist', () => {
     const result = calculateProfitability({
       purchase_price: 100,
       selling_price: 0,
@@ -68,6 +68,7 @@ describe('calculateProfitability', () => {
 
     expect(result.marginPct).toBe(0);
     expect(result.netProfit).toBe(-100);
+    expect(result.status).toBe('unprofitable');
   });
 
   it('handles empty/partial data gracefully', () => {
