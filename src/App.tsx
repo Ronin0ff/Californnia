@@ -104,7 +104,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to={authenticatedRedirect} replace /> : <Landing />} />
+      <Route path="/" element={<Landing />} />
       <Route path="/demo" element={<Demo />} />
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/terms" element={<TermsOfService />} />
