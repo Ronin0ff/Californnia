@@ -205,28 +205,32 @@ const SkuManagement: React.FC = () => {
         toast.success('SKU создан');
       }
 
-      if (calc.status === 'unprofitable') {
-        await alertApi.create({
-          sku_id: savedSkuId,
-          type: 'unprofitable_sku',
-          message: `SKU "${skuData.name}" убыточен: маржа ${calc.marginPct.toFixed(1)}%`,
-          threshold_value: 0,
-          current_value: calc.marginPct,
-          is_read: false,
-        });
-      } else if (calc.marginPct < 5) {
-        await alertApi.create({
-          sku_id: savedSkuId,
-          type: 'low_margin',
-          message: `SKU "${skuData.name}" низкая маржа: ${calc.marginPct.toFixed(1)}%`,
-          threshold_value: 5,
-          current_value: calc.marginPct,
-          is_read: false,
-        });
-      }
-
       setDialogOpen(false);
       loadData();
+
+      try {
+        if (calc.status === 'unprofitable') {
+          await alertApi.create({
+            sku_id: savedSkuId,
+            type: 'unprofitable_sku',
+            message: `SKU "${skuData.name}" убыточен: маржа ${calc.marginPct.toFixed(1)}%`,
+            threshold_value: 0,
+            current_value: calc.marginPct,
+            is_read: false,
+          });
+        } else if (calc.marginPct < 5) {
+          await alertApi.create({
+            sku_id: savedSkuId,
+            type: 'low_margin',
+            message: `SKU "${skuData.name}" низкая маржа: ${calc.marginPct.toFixed(1)}%`,
+            threshold_value: 5,
+            current_value: calc.marginPct,
+            is_read: false,
+          });
+        }
+      } catch {
+        // Alert creation is non-critical; SKU already saved successfully
+      }
     } catch (error: any) {
       toast.error(error?.message || 'Ошибка сохранения');
     }
