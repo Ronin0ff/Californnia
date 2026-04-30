@@ -134,6 +134,11 @@ const SkuManagement: React.FC = () => {
       return;
     }
 
+    if (!editingSku && !isOwner && !canCreateSku(currentPlan, skus.length)) {
+      toast.error(`Лимит SKU для тарифа ${currentPlan || 'free'}: ${planLimits.maxSkus}. Перейдите на более высокий тариф.`);
+      return;
+    }
+
     const mpId = parseInt(form.marketplace_id) || 1;
     const mp = marketplaces.find((m) => m.id === mpId) || marketplaces[0];
 
@@ -158,7 +163,10 @@ const SkuManagement: React.FC = () => {
     skuData.status = calc.status;
 
     try {
+      let savedSkuId: number;
+
       if (editingSku) {
+        savedSkuId = editingSku.id;
         await skuApi.update(editingSku.id, skuData);
         const existingCosts = await costStructureApi.getBySkuId(editingSku.id);
         const costData = {
@@ -181,6 +189,7 @@ const SkuManagement: React.FC = () => {
         toast.success('SKU обновлён');
       } else {
         const newSku = await skuApi.create(skuData);
+        savedSkuId = newSku.id;
         await costStructureApi.create({
           sku_id: newSku.id,
           commission_amount: calc.commission,
@@ -193,28 +202,27 @@ const SkuManagement: React.FC = () => {
           net_profit: calc.netProfit,
           margin_pct: calc.marginPct,
         });
-
-        if (calc.status === 'unprofitable') {
-          await alertApi.create({
-            sku_id: newSku.id,
-            type: 'unprofitable_sku',
-            message: `SKU "${skuData.name}" убыточен: маржа ${calc.marginPct.toFixed(1)}%`,
-            threshold_value: 0,
-            current_value: calc.marginPct,
-            is_read: false,
-          });
-        } else if (calc.marginPct < 5) {
-          await alertApi.create({
-            sku_id: newSku.id,
-            type: 'low_margin',
-            message: `SKU "${skuData.name}" низкая маржа: ${calc.marginPct.toFixed(1)}%`,
-            threshold_value: 5,
-            current_value: calc.marginPct,
-            is_read: false,
-          });
-        }
-
         toast.success('SKU создан');
+      }
+
+      if (calc.status === 'unprofitable') {
+        await alertApi.create({
+          sku_id: savedSkuId,
+          type: 'unprofitable_sku',
+          message: `SKU "${skuData.name}" убыточен: маржа ${calc.marginPct.toFixed(1)}%`,
+          threshold_value: 0,
+          current_value: calc.marginPct,
+          is_read: false,
+        });
+      } else if (calc.marginPct < 5) {
+        await alertApi.create({
+          sku_id: savedSkuId,
+          type: 'low_margin',
+          message: `SKU "${skuData.name}" низкая маржа: ${calc.marginPct.toFixed(1)}%`,
+          threshold_value: 5,
+          current_value: calc.marginPct,
+          is_read: false,
+        });
       }
 
       setDialogOpen(false);
