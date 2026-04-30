@@ -41,17 +41,24 @@ const PermissionGuard: React.FC<{
   permission: keyof PermissionMap;
   children: React.ReactNode;
 }> = ({ permission, children }) => {
-  const { permissions } = useAuth();
+  const { permissions, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 animate-pulse" />
+          <div className="text-white/40 text-sm">Загрузка...</div>
+        </div>
+      </div>
+    );
+  }
   if (!permissions[permission]) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-        <div className="rounded-full bg-red-500/10 p-4 mb-4">
-          <svg className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-white mb-2">Доступ ограничен</h2>
+          <p className="text-white/50">Эта функция недоступна на вашем тарифе</p>
         </div>
-        <h2 className="text-xl font-semibold text-white">Доступ ограничен</h2>
-        <p className="mt-2 text-white/40">Эта функция недоступна на вашем тарифе. Перейдите на более высокий план.</p>
       </div>
     );
   }
