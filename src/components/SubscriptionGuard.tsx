@@ -25,7 +25,7 @@ const SubscriptionGuard: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   if (!currentPlan) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/app/pricing" replace />;
   }
 
   return <>{children}</>;

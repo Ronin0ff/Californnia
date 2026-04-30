@@ -67,7 +67,7 @@ const OwnerGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 };
 
 const AppRoutes = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, currentPlan } = useAuth();
 
   if (loading) {
     return (
@@ -80,9 +80,11 @@ const AppRoutes = () => {
     );
   }
 
+  const authenticatedRedirect = currentPlan ? '/app' : '/app/pricing';
+
   return (
     <Routes>
-      <Route path="/" element={user ? <Navigate to="/app" replace /> : <Landing />} />
+      <Route path="/" element={user ? <Navigate to={authenticatedRedirect} replace /> : <Landing />} />
       <Route path="/demo" element={<Demo />} />
       {/* App routes */}
       <Route path="/app" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="dashboard"><Dashboard /></PermissionGuard></AppLayout></SubscriptionGuard>} />
@@ -95,9 +97,9 @@ const AppRoutes = () => {
       <Route path="/app/repricer" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="repricer"><Repricer /></PermissionGuard></AppLayout></SubscriptionGuard>} />
       <Route path="/app/bidder" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="bidder"><Bidder /></PermissionGuard></AppLayout></SubscriptionGuard>} />
       <Route path="/app/cards" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="cards"><ProductCards /></PermissionGuard></AppLayout></SubscriptionGuard>} />
-      <Route path="/app/profile" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="profile"><Profile /></PermissionGuard></AppLayout></SubscriptionGuard>} />
+      <Route path="/app/profile" element={<AppLayout><PermissionGuard permission="profile"><Profile /></PermissionGuard></AppLayout>} />
       <Route path="/app/integrations" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="integrations"><Integrations /></PermissionGuard></AppLayout></SubscriptionGuard>} />
-      <Route path="/app/pricing" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="pricing"><Pricing /></PermissionGuard></AppLayout></SubscriptionGuard>} />
+      <Route path="/app/pricing" element={<AppLayout><PermissionGuard permission="pricing"><Pricing /></PermissionGuard></AppLayout>} />
       <Route path="/app/team" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="team"><Team /></PermissionGuard></AppLayout></SubscriptionGuard>} />
       {/* Admin */}
       <Route path="/app/admin" element={<OwnerGuard><AdminLayout><AdminDashboard /></AdminLayout></OwnerGuard>} />

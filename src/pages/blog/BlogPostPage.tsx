@@ -16,12 +16,8 @@ const BlogPostPage = () => {
 
   return (
     <BlogArticleLayout
-      seoMeta={{
-        title: frontmatter.title ?? post.title,
-        description: frontmatter.description ?? post.description,
-        ogImage: frontmatter.ogImage,
-        canonicalUrl: frontmatter.canonicalUrl,
-      }}
+      title={frontmatter.title ?? post.title}
+      description={frontmatter.description ?? post.description}
     >
       <main className="min-h-screen bg-slate-50 text-slate-900">
         {/* Header matching app style */}
