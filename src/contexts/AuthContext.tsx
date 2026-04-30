@@ -163,27 +163,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const determineRole = useCallback(async (userId: string, userEmail?: string) => {
     try {
       // Check if user is an owner via backend entity (not hardcoded)
+      let foundOwner = false;
       try {
         const ownerRes = await client.entities.owners.queryAll({
           query: { email: (userEmail || '').toLowerCase(), status: 'active' },
           limit: 1,
         });
         const owners = ownerRes.data?.items || [];
-        if (owners.length > 0) {
-          setRole('owner');
-          setPermissions(DEFAULT_PERMISSIONS);
-          setCurrentPlan('enterprise');
-          return;
-        }
+        foundOwner = owners.length > 0;
       } catch {
-        // owners entity may not exist yet — fall back to env-based check
+        // owners entity may not exist yet
+      }
+
+      if (!foundOwner && userEmail) {
         const ownerEmails = (import.meta.env.VITE_OWNER_EMAILS || '').split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean);
-        if (userEmail && ownerEmails.includes(userEmail.toLowerCase())) {
-          setRole('owner');
-          setPermissions(DEFAULT_PERMISSIONS);
-          setCurrentPlan('enterprise');
-          return;
-        }
+        foundOwner = ownerEmails.includes(userEmail.toLowerCase());
+      }
+
+      if (foundOwner) {
+        setRole('owner');
+        setPermissions(DEFAULT_PERMISSIONS);
+        setCurrentPlan('enterprise');
+        return;
       }
 
       if (userEmail) {
