@@ -26,7 +26,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Pencil, Trash2, Search, Package } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, Package, Download, Upload, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 import {
   skuApi,
@@ -37,8 +37,12 @@ import {
   type Marketplace,
   calculateProfitability,
 } from '@/lib/marketplace-api';
+import { useAuth } from '@/contexts/AuthContext';
+import { canCreateSku, getPlanLimits, getSkuUsagePercent } from '@/lib/plan-limits';
+import { Progress } from '@/components/ui/progress';
 
 const SkuManagement: React.FC = () => {
+  const { currentPlan, isOwner } = useAuth();
   const [skus, setSkus] = useState<Sku[]>([]);
   const [marketplaces, setMarketplaces] = useState<Marketplace[]>([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +95,15 @@ const SkuManagement: React.FC = () => {
     }
   };
 
+  const planLimits = getPlanLimits(currentPlan);
+  const skuUsagePercent = getSkuUsagePercent(currentPlan, skus.length);
+  const canAdd = isOwner || canCreateSku(currentPlan, skus.length);
+
   const openCreate = () => {
+    if (!canAdd) {
+      toast.error(`Лимит SKU для тарифа ${currentPlan || 'free'}: ${planLimits.maxSkus}. Перейдите на более высокий тариф.`);
+      return;
+    }
     setEditingSku(null);
     setForm(emptyForm);
     setDialogOpen(true);
@@ -238,6 +250,73 @@ const SkuManagement: React.FC = () => {
     }
   };
 
+  const exportCSV = () => {
+    const headers = ['Артикул', 'Название', 'Категория', 'Маркетплейс', 'Закупочная цена', 'Цена продажи', 'Комиссия %', 'Логистика', 'Возврат %', 'Хранение/мес', 'Реклама', 'НДС %', 'Прибыль', 'Маржа %', 'Статус'];
+    const rows = filteredSkus.map(s => [
+      s.article, s.name, s.category, getMarketplaceName(s.marketplace_id),
+      s.purchase_price, s.selling_price, s.commission_pct, s.logistics_cost,
+      s.return_rate_pct, s.storage_cost_monthly, s.ad_spend_per_unit, s.tax_rate_pct,
+      s.net_profit, s.margin_pct, s.status,
+    ]);
+    const csv = [headers, ...rows].map(r => r.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `profitpilot-skus-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`Экспортировано ${filteredSkus.length} SKU`);
+  };
+
+  const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const text = ev.target?.result as string;
+        const lines = text.split('\n').filter(l => l.trim());
+        if (lines.length < 2) {
+          toast.error('Файл пуст или содержит только заголовки');
+          return;
+        }
+        let imported = 0;
+        for (let i = 1; i < lines.length; i++) {
+          const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+          if (cols.length < 12) continue;
+          const mp = marketplaces.find(m => m.name.toLowerCase() === cols[3].toLowerCase());
+          const data: Partial<Sku> = {
+            article: cols[0],
+            name: cols[1],
+            category: cols[2],
+            marketplace_id: mp?.id || marketplaces[0]?.id || 1,
+            purchase_price: parseFloat(cols[4]) || 0,
+            selling_price: parseFloat(cols[5]) || 0,
+            commission_pct: parseFloat(cols[6]) || 0,
+            logistics_cost: parseFloat(cols[7]) || 0,
+            return_rate_pct: parseFloat(cols[8]) || 0,
+            storage_cost_monthly: parseFloat(cols[9]) || 0,
+            ad_spend_per_unit: parseFloat(cols[10]) || 0,
+            tax_rate_pct: parseFloat(cols[11]) || 0,
+          };
+          const calc = calculateProfitability(data);
+          data.net_profit = calc.netProfit;
+          data.margin_pct = calc.marginPct;
+          data.status = calc.status;
+          await skuApi.create(data);
+          imported++;
+        }
+        toast.success(`Импортировано ${imported} SKU`);
+        loadData();
+      } catch (err: any) {
+        toast.error(err?.message || 'Ошибка импорта CSV');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
   const filteredSkus = skus.filter((sku) => {
     const matchSearch =
       !search ||
@@ -263,7 +342,24 @@ const SkuManagement: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Управление SKU</h1>
           <p className="text-slate-300 dark:text-white/30 mt-1">Добавляйте и редактируйте товары для анализа прибыльности</p>
+          {planLimits.maxSkus !== Infinity && (
+            <div className="flex items-center gap-3 mt-2">
+              <Progress value={skuUsagePercent} className="h-1.5 w-32 bg-white/[0.06]" />
+              <span className="text-xs text-white/30">{skus.length} / {planLimits.maxSkus} SKU</span>
+              {!canAdd && <Badge className="bg-amber-500/10 text-amber-400 border-amber-500/20 text-xs"><AlertTriangle className="h-3 w-3 mr-1" />Лимит</Badge>}
+            </div>
+          )}
         </div>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={exportCSV} className="border-white/10 text-white/50 hover:text-white hover:bg-white/5" title="Экспорт CSV">
+            <Download className="h-4 w-4 mr-1.5" />
+            <span className="hidden sm:inline">Экспорт</span>
+          </Button>
+          <Button variant="outline" size="sm" className="border-white/10 text-white/50 hover:text-white hover:bg-white/5 relative" title="Импорт CSV">
+            <Upload className="h-4 w-4 mr-1.5" />
+            <span className="hidden sm:inline">Импорт</span>
+            <input type="file" accept=".csv" onChange={importCSV} className="absolute inset-0 opacity-0 cursor-pointer" />
+          </Button>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={openCreate} className="bg-emerald-500 hover:bg-emerald-600 text-white">
@@ -411,6 +507,7 @@ const SkuManagement: React.FC = () => {
             </div>
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Filters */}

@@ -104,7 +104,7 @@ export default function Team() {
     setSaving(true);
     try {
       await client.entities.managers.update({
-        id: editingManager.id,
+        id: String(editingManager.id),
         data: {
           name: editingManager.name,
           email: editingManager.email,
@@ -126,7 +126,7 @@ export default function Team() {
   const handleDeleteManager = async () => {
     if (!deleteId) return;
     try {
-      await client.entities.managers.delete({ id: deleteId });
+      await client.entities.managers.delete({ id: String(deleteId) });
       setDeleteId(null);
       await fetchManagers();
     } catch (err) {
@@ -138,7 +138,7 @@ export default function Team() {
     try {
       const newStatus = mgr.status === 'active' ? 'inactive' : 'active';
       await client.entities.managers.update({
-        id: mgr.id,
+        id: String(mgr.id),
         data: { status: newStatus },
       });
       await fetchManagers();

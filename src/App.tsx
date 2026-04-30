@@ -34,6 +34,9 @@ import Team from './pages/Team';
 import BlogRoutes from './blog-routes';
 import React from 'react';
 import { ThemeProvider } from './components/ThemeProvider';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import CookieConsent from './components/CookieConsent';
 
 const queryClient = new QueryClient();
 
@@ -103,6 +106,8 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={user ? <Navigate to={authenticatedRedirect} replace /> : <Landing />} />
       <Route path="/demo" element={<Demo />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/terms" element={<TermsOfService />} />
       {/* App routes */}
       <Route path="/app" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="dashboard"><Dashboard /></PermissionGuard></AppLayout></SubscriptionGuard>} />
       <Route path="/app/skus" element={<SubscriptionGuard><AppLayout><PermissionGuard permission="skus"><SkuManagement /></PermissionGuard></AppLayout></SubscriptionGuard>} />
@@ -144,6 +149,7 @@ const App = () => (
             <Toaster />
             <BrowserRouter>
               <AppRoutes />
+              <CookieConsent />
             </BrowserRouter>
           </TooltipProvider>
         </ThemeProvider>

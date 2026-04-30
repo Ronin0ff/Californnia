@@ -30,6 +30,7 @@ import {
 } from 'recharts';
 import { useAuth } from '@/contexts/AuthContext';
 import { skuApi, type Sku, calculateProfitability } from '@/lib/marketplace-api';
+import OnboardingTour from '@/components/OnboardingTour';
 
 const Dashboard: React.FC = () => {
   const { currentPlan } = useAuth();
@@ -80,6 +81,8 @@ const Dashboard: React.FC = () => {
           <h1 className="text-2xl font-bold text-white">Дашборд</h1>
           <p className="text-white/40 mt-1">Обзор вашего бизнеса на маркетплейсах</p>
         </div>
+
+        <OnboardingTour />
 
         <Card className="bg-white/[0.02] border-white/[0.06]">
           <CardContent className="p-12 text-center">

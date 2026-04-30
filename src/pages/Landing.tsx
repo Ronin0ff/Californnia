@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useDemoMode } from '@/contexts/DemoModeContext';
 import { Button } from '@/components/ui/button';
@@ -439,12 +440,17 @@ export default function Landing() {
 
       {/* Footer */}
       <footer className="relative z-10 border-t border-white/[0.04] py-12 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center">
               <Compass className="w-4 h-4 text-white" />
             </div>
             <span className="font-bold text-white">ProfitPilot <span className="text-emerald-400">AI</span></span>
+          </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link to="/privacy" className="text-white/30 hover:text-white/60 transition-colors">Конфиденциальность</Link>
+            <Link to="/terms" className="text-white/30 hover:text-white/60 transition-colors">Условия использования</Link>
+            <a href="mailto:support@profitpilot.ai" className="text-white/30 hover:text-white/60 transition-colors">Поддержка</a>
           </div>
           <p className="text-sm text-white/30">© 2026 ProfitPilot AI. Оптимизация прибыли на WB и Ozon.</p>
         </div>

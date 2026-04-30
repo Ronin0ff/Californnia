@@ -162,11 +162,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const determineRole = useCallback(async (userId: string, userEmail?: string) => {
     try {
-      if (userEmail && userEmail.toLowerCase() === 'lok19787@gmail.com') {
-        setRole('owner');
-        setPermissions(DEFAULT_PERMISSIONS);
-        setCurrentPlan('enterprise');
-        return;
+      // Check if user is an owner via backend entity (not hardcoded)
+      try {
+        const ownerRes = await client.entities.owners.queryAll({
+          query: { email: (userEmail || '').toLowerCase(), status: 'active' },
+          limit: 1,
+        });
+        const owners = ownerRes.data?.items || [];
+        if (owners.length > 0) {
+          setRole('owner');
+          setPermissions(DEFAULT_PERMISSIONS);
+          setCurrentPlan('enterprise');
+          return;
+        }
+      } catch {
+        // owners entity may not exist yet — fall back to env-based check
+        const ownerEmails = (import.meta.env.VITE_OWNER_EMAILS || '').split(',').map((e: string) => e.trim().toLowerCase()).filter(Boolean);
+        if (userEmail && ownerEmails.includes(userEmail.toLowerCase())) {
+          setRole('owner');
+          setPermissions(DEFAULT_PERMISSIONS);
+          setCurrentPlan('enterprise');
+          return;
+        }
       }
 
       if (userEmail) {
@@ -205,7 +222,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
         const subs = subRes.data?.items || [];
         if (subs.length > 0) {
-          const plan = (subs[0].plan_id || subs[0].plan || 'standard') as SubscriptionPlan;
+          const sub = subs[0];
+          const plan = (sub.plan_id || sub.plan || 'standard') as SubscriptionPlan;
+
+          // Check if trial has expired
+          if (sub.is_trial && sub.trial_ends_at) {
+            const trialEnd = new Date(sub.trial_ends_at);
+            if (trialEnd < new Date()) {
+              // Trial expired — redirect to pricing
+              setRole('client');
+              setCurrentPlan(null);
+              setPermissions({ ...NO_PERMISSIONS, profile: true, pricing: true });
+              return;
+            }
+          }
+
           setCurrentPlan(plan);
           setRole('client');
           setPermissions(getPermissionsForPlan(plan));

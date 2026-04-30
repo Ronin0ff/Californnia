@@ -18,12 +18,8 @@ async function initializeApp() {
 
   try {
     await loadRuntimeConfig();
-    console.log('Runtime configuration loaded successfully');
-  } catch (error) {
-    console.warn(
-      'Failed to load runtime configuration, using defaults:',
-      error
-    );
+  } catch {
+    // Runtime config not available, using defaults
   }
 
   // Render the app
