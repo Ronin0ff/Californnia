@@ -66,7 +66,17 @@ const PermissionGuard: React.FC<{
 };
 
 const OwnerGuard: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { isOwner } = useAuth();
+  const { isOwner, loading } = useAuth();
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 animate-pulse" />
+          <div className="text-white/40 text-sm">Загрузка...</div>
+        </div>
+      </div>
+    );
+  }
   if (!isOwner) {
     return <Navigate to="/app" replace />;
   }
