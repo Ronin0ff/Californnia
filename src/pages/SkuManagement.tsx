@@ -269,6 +269,36 @@ const SkuManagement: React.FC = () => {
     toast.success(`Экспортировано ${filteredSkus.length} SKU`);
   };
 
+  const parseCSVLine = (line: string): string[] => {
+    const fields: string[] = [];
+    let current = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"' && line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else if (ch === '"') {
+          inQuotes = false;
+        } else {
+          current += ch;
+        }
+      } else {
+        if (ch === '"') {
+          inQuotes = true;
+        } else if (ch === ',') {
+          fields.push(current.trim());
+          current = '';
+        } else {
+          current += ch;
+        }
+      }
+    }
+    fields.push(current.trim());
+    return fields;
+  };
+
   const importCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -281,9 +311,19 @@ const SkuManagement: React.FC = () => {
           toast.error('Файл пуст или содержит только заголовки');
           return;
         }
+        const remaining = isOwner ? Infinity : planLimits.maxSkus - skus.length;
+        const dataRows = lines.length - 1;
+        if (!isOwner && remaining <= 0) {
+          toast.error(`Лимит SKU исчерпан (${planLimits.maxSkus}). Перейдите на более высокий тариф.`);
+          return;
+        }
+        if (!isOwner && dataRows > remaining) {
+          toast.warning(`Будет импортировано только ${remaining} из ${dataRows} SKU (лимит тарифа: ${planLimits.maxSkus}).`);
+        }
         let imported = 0;
         for (let i = 1; i < lines.length; i++) {
-          const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+          if (!isOwner && imported >= remaining) break;
+          const cols = parseCSVLine(lines[i]);
           if (cols.length < 12) continue;
           const mp = marketplaces.find(m => m.name.toLowerCase() === cols[3].toLowerCase());
           const data: Partial<Sku> = {
