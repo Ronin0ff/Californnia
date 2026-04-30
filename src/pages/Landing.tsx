@@ -193,17 +193,12 @@ export default function Landing() {
 
     setIsProcessing(true);
     try {
-      const plan = PRICING_PLANS.find(p => p.id === selectedPlan);
-      const amount = parseInt(plan?.price.replace(/\s/g, '') || '0');
-
       const response = await client.apiCall.invoke({
         url: '/api/v1/payments/create',
         method: 'POST',
         data: {
           plan_id: selectedPlan,
-          amount,
           email: paymentEmail,
-          description: `Подписка ProfitPilot AI — ${plan?.name}`,
         },
       });
 

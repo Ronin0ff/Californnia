@@ -165,8 +165,7 @@ const Pricing: React.FC = () => {
         method: 'POST',
         data: {
           plan_id: selectedPlan,
-          amount: getPrice(plans.find(p => p.id === selectedPlan) || plans[0]),
-          description: `Подписка ProfitPilot — ${plans.find(p => p.id === selectedPlan)?.name} (${billingPeriod === 'yearly' ? 'годовая' : 'ежемесячная'})`,
+          billing_period: billingPeriod,
         },
       });
 
