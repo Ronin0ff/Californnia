@@ -134,8 +134,12 @@ const Pricing: React.FC = () => {
     return billingPeriod === 'yearly' ? Math.round(plan.price * 10) : plan.price;
   };
 
+  const getDisplayPrice = (plan: typeof plans[0]) => {
+    return billingPeriod === 'yearly' ? Math.round(plan.price * 10 / 12) : plan.price;
+  };
+
   const getPeriodLabel = () => {
-    return billingPeriod === 'yearly' ? '/мес (годовая оплата)' : '/мес';
+    return billingPeriod === 'yearly' ? '/мес (оплата за год)' : '/мес';
   };
 
   const openPaymentDialog = (planId: string) => {
@@ -268,9 +272,14 @@ const Pricing: React.FC = () => {
               <CardContent className="text-center">
                 <div className="mb-6">
                   <span className={`text-4xl font-bold ${tc('text-white', 'text-slate-900')}`}>
-                    {`${getPrice(plan).toLocaleString()} ₽`}
+                    {`${getDisplayPrice(plan).toLocaleString()} ₽`}
                   </span>
                   <span className={`text-sm ${tc('text-white/25', 'text-slate-400')}`}>{getPeriodLabel()}</span>
+                  {billingPeriod === 'yearly' && (
+                    <div className={`text-xs mt-1 ${tc('text-emerald-400/60', 'text-emerald-600')}`}>
+                      Итого за год: {getPrice(plan).toLocaleString()} ₽
+                    </div>
+                  )}
                 </div>
 
                 {isCurrent ? (
@@ -356,13 +365,13 @@ const Pricing: React.FC = () => {
                 <tr className={tc('border-t border-white/[0.06]', 'border-t border-slate-100')}>
                   <td className={`py-4 px-4 font-bold ${tc('text-white/70', 'text-slate-700')}`}>Цена</td>
                   <td className={`py-4 px-4 text-center font-bold ${tc('text-blue-400', 'text-blue-600')}`}>
-                    {getPrice(plans[0]).toLocaleString()} ₽{getPeriodLabel()}
+                    {getDisplayPrice(plans[0]).toLocaleString()} ₽{getPeriodLabel()}
                   </td>
                   <td className={`py-4 px-4 text-center font-bold text-emerald-400 ${tc('bg-emerald-500/[0.03]', 'bg-emerald-50/50')}`}>
-                    {getPrice(plans[1]).toLocaleString()} ₽{getPeriodLabel()}
+                    {getDisplayPrice(plans[1]).toLocaleString()} ₽{getPeriodLabel()}
                   </td>
                   <td className="py-4 px-4 text-center font-bold text-amber-400">
-                    {getPrice(plans[2]).toLocaleString()} ₽{getPeriodLabel()}
+                    {getDisplayPrice(plans[2]).toLocaleString()} ₽{getPeriodLabel()}
                   </td>
                 </tr>
               </tbody>
@@ -402,7 +411,7 @@ const Pricing: React.FC = () => {
           <DialogHeader>
             <DialogTitle className={tc('text-white', 'text-slate-900')}>Оформление подписки</DialogTitle>
             <DialogDescription className={tc('text-white/30', 'text-slate-500')}>
-              Тариф {plans.find(p => p.id === selectedPlan)?.name} — {getPrice(plans.find(p => p.id === selectedPlan) || plans[0]).toLocaleString()} ₽{getPeriodLabel()}
+              Тариф {plans.find(p => p.id === selectedPlan)?.name} — {getDisplayPrice(plans.find(p => p.id === selectedPlan) || plans[0]).toLocaleString()} ₽{getPeriodLabel()}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">

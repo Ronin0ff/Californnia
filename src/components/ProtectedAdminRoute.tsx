@@ -12,7 +12,7 @@ interface ProtectedAdminRouteProps {
 const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
   children,
 }) => {
-  const { user, loading, isAdmin, login } = useAuth();
+  const { user, loading, isOwner: isAdmin, login } = useAuth();
   const location = useLocation();
 
   // Loading state
@@ -58,7 +58,7 @@ const ProtectedAdminRoute: React.FC<ProtectedAdminRouteProps> = ({
                   </span>
                 </div>
                 <div className="text-xs text-gray-500 mt-1">
-                  Role: {user.role === 'user' ? 'Regular user' : user.role}
+                  Role: {isAdmin ? 'Administrator' : 'Regular user'}
                 </div>
               </div>
               <p className="text-sm">
