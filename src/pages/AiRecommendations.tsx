@@ -16,6 +16,8 @@ import {
   client,
   skuApi,
   aiRecommendationApi,
+  costStructureApi,
+  calculateProfitability,
   type Sku,
   type AiRecommendation,
 } from '@/lib/marketplace-api';
@@ -168,7 +170,32 @@ ${customPrompt ? `Дополнительный запрос: ${customPrompt}` : 
       if (rec.recommended_price) {
         const sku = skus.find((s) => s.id === rec.sku_id);
         if (sku) {
-          await skuApi.update(sku.id, { selling_price: rec.recommended_price });
+          const updatedSku = { ...sku, selling_price: rec.recommended_price };
+          const calc = calculateProfitability(updatedSku);
+          await skuApi.update(sku.id, {
+            selling_price: rec.recommended_price,
+            net_profit: calc.netProfit,
+            margin_pct: calc.marginPct,
+            status: calc.status,
+          });
+          const existingCosts = await costStructureApi.getBySkuId(sku.id);
+          const costData = {
+            sku_id: sku.id,
+            commission_amount: calc.commission,
+            logistics_amount: calc.logistics,
+            return_cost_amount: calc.returnCost,
+            storage_amount: calc.storage,
+            ad_spend_amount: calc.adSpend,
+            vat_amount: calc.vat,
+            total_cost: calc.totalCost,
+            net_profit: calc.netProfit,
+            margin_pct: calc.marginPct,
+          };
+          if (existingCosts.length > 0) {
+            await costStructureApi.update(existingCosts[0].id, costData);
+          } else {
+            await costStructureApi.create(costData);
+          }
         }
       }
       toast.success('Рекомендация принята');
