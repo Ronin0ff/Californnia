@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import {
   Select,
@@ -118,12 +117,12 @@ const SkuManagement: React.FC = () => {
       category: sku.category || '',
       purchase_price: String(sku.purchase_price),
       selling_price: String(sku.selling_price),
-      commission_pct: String(sku.commission_pct || ''),
-      logistics_cost: String(sku.logistics_cost || ''),
-      return_rate_pct: String(sku.return_rate_pct || ''),
-      storage_cost_monthly: String(sku.storage_cost_monthly || ''),
-      ad_spend_per_unit: String(sku.ad_spend_per_unit || ''),
-      tax_rate_pct: String(sku.tax_rate_pct || ''),
+      commission_pct: String(sku.commission_pct ?? ''),
+      logistics_cost: String(sku.logistics_cost ?? ''),
+      return_rate_pct: String(sku.return_rate_pct ?? ''),
+      storage_cost_monthly: String(sku.storage_cost_monthly ?? ''),
+      ad_spend_per_unit: String(sku.ad_spend_per_unit ?? ''),
+      tax_rate_pct: String(sku.tax_rate_pct ?? ''),
     });
     setDialogOpen(true);
   };
@@ -412,12 +411,10 @@ const SkuManagement: React.FC = () => {
             <span className="hidden sm:inline">Импорт</span>
             <input type="file" accept=".csv" onChange={importCSV} className="absolute inset-0 opacity-0 cursor-pointer" />
           </Button>
+          <Button onClick={openCreate} className="bg-emerald-500 hover:bg-emerald-600 text-white">
+            <Plus className="mr-2 h-4 w-4" /> Добавить SKU
+          </Button>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={openCreate} className="bg-emerald-500 hover:bg-emerald-600 text-white">
-              <Plus className="mr-2 h-4 w-4" /> Добавить SKU
-            </Button>
-          </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0d0d14] border-slate-200 dark:border-white/[0.06]">
             <DialogHeader>
               <DialogTitle className="text-slate-900 dark:text-white">{editingSku ? 'Редактировать SKU' : 'Добавить SKU'}</DialogTitle>
